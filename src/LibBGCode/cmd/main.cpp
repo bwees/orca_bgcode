@@ -1,5 +1,6 @@
 #include "convert/convert.hpp"
 
+#include <cstdio>
 #include <string>
 #include <string_view>
 #include <iostream>
@@ -31,7 +32,7 @@ static const std::vector<Parameter> parameters = {
     { "slicer_metadata_compression"sv, { "None"sv, "Deflate"sv, "Heatshrink_11_4"sv, "Heatshrink_12_4"sv }, (size_t)DefaultBinarizerConfig.compression.slicer_metadata },
     { "gcode_compression"sv, { "None"sv, "Deflate"sv, "Heatshrink_11_4"sv, "Heatshrink_12_4"sv }, (size_t)DefaultBinarizerConfig.compression.gcode },
     { "gcode_encoding"sv, { "None"sv, "MeatPack"sv, "MeatPackComments"sv }, (size_t)DefaultBinarizerConfig.gcode_encoding },
-    { "metadata_encoding"sv, { "INI"sv }, (size_t) DefaultBinarizerConfig.metadata_encoding }
+    { "metadata_encoding"sv, { "INI"sv }, (size_t) DefaultBinarizerConfig.metadata_encoding },
 };
 
 class ScopedFile
@@ -60,7 +61,7 @@ void show_help() {
     }
 }
 
-bool parse_args(int argc, const char* argv[], std::string& src_filename, bool& src_is_binary, BinarizerConfig& config)
+bool parse_args(int argc, const char* argv[], std::string& src_filename, bool& src_is_binary, bool& is_post_processing, BinarizerConfig& config)
 {
     if (argc < 2) {
         show_help();
@@ -73,19 +74,20 @@ bool parse_args(int argc, const char* argv[], std::string& src_filename, bool& s
         arguments.push_back(argv[i]);
     }
 
-    size_t pos = arguments[1].find_last_of(".");
+    size_t pos = arguments[argc-1].find_last_of(".");
     if (pos == std::string::npos) {
-        std::cout << "Invalid filename " << arguments[1] << " (required extensions: .gcode or .bgcode or .bgc)\n";
+        std::cout << "Invalid filename " << arguments[argc-1] << " (required extensions: .gcode or .bgcode or .bgc)\n";
         return false;
     }
-    const std::string_view extension = arguments[1].substr(pos);
+    const std::string_view extension = arguments[argc-1].substr(pos);
     if (extension != ".gcode" && extension != ".GCODE" &&
         extension != ".bgcode" && extension != ".BGCODE" &&
+        extension != ".pp" &&
         extension != ".bgc" && extension != ".BGC") {
         std::cout << "Found invalid extension '" << extension << "' (required extensions: .gcode or .bgcode or .bgc)\n";
         return false;
     }
-    src_filename = arguments[1];
+    src_filename = arguments[argc-1];
 
     FILE* src_file = boost::nowide::fopen(src_filename.c_str(), "rb");
     if (src_file == nullptr) {
@@ -96,7 +98,7 @@ bool parse_args(int argc, const char* argv[], std::string& src_filename, bool& s
     fclose(src_file);
 
     if (!src_is_binary) {
-        for (size_t i = 2; i < arguments.size(); ++i) {
+        for (size_t i = 1; i < arguments.size()-1; ++i) {
             const std::string_view& a = arguments[i];
             if (a.length() < 2 || a[0] != '-' || a[1] != '-') {
                 std::cout << "Found invalid parameter '" << a << "'\n";
@@ -106,6 +108,11 @@ bool parse_args(int argc, const char* argv[], std::string& src_filename, bool& s
 
             pos = a.find("=");
             if (pos == std::string_view::npos) {
+                if (a.find("post-processor") != std::string_view::npos) {
+                    is_post_processing = true;
+                    continue;
+                }
+
                 std::cout << "Found invalid parameter '" << a << "'\n";
                 std::cout << "Required syntax: --parameter=value\n";
                 return false;
@@ -166,8 +173,9 @@ int main(int argc, const char* argv[])
 {
     std::string src_filename;
     bool src_is_binary;
+    bool is_post_processing = false;
     BinarizerConfig config;
-    if (!parse_args(argc, argv, src_filename, src_is_binary, config))
+    if (!parse_args(argc, argv, src_filename, src_is_binary, is_post_processing, config))
         return EXIT_FAILURE;
 
     // Open source file
@@ -225,6 +233,35 @@ int main(int argc, const char* argv[])
         std::cout << "Unable to convert the file '" << src_filename << "'\n";
         std::cout << "Error: " << translate_result(res) << "\n";
         return EXIT_FAILURE;
+    }
+
+    if (is_post_processing) {
+        // move file to be in place of the original file
+        if (std::rename(dst_filename.c_str(), src_filename.c_str()) != 0) {
+            std::cout << "Unable to move file '" << dst_filename << "' to '" << src_filename << "'\n";
+            return EXIT_FAILURE;
+        }
+
+        // provide suggestion for new filename in file
+        
+        // get env SLIC3R_PP_OUTPUT_NAME
+        const char* gcode_output_name_c_str = std::getenv("SLIC3R_PP_OUTPUT_NAME");
+        const std::string gcode_output_name = gcode_output_name_c_str;
+        const size_t gcode_pos = gcode_output_name.find_last_of(".");
+        const std::string src_stem_bgcode = gcode_output_name.substr(0, gcode_pos) + ".bgcode";
+
+
+        FILE* new_name = boost::nowide::fopen((src_filename + ".output_name").c_str(), "wb");
+        if (new_name == nullptr) {
+            std::cout << "Unable to open file '" << src_filename << ".output_name'\n";
+            return EXIT_FAILURE;
+        }
+
+        std::cout << "Suggested new filename: " << src_stem_bgcode << "\n";
+        std::cout << "Suggested new filename file: " << src_filename + ".output_name" << "\n";
+
+        fwrite(src_stem_bgcode.c_str(), 1, src_stem_bgcode.size(), new_name);
+        fclose(new_name);
     }
 
     return EXIT_SUCCESS;
