@@ -79,13 +79,25 @@ bool parse_args(int argc, const char* argv[], std::string& src_filename, bool& s
         std::cout << "Invalid filename " << arguments[argc-1] << " (required extensions: .gcode or .bgcode or .bgc)\n";
         return false;
     }
-    const std::string_view extension = arguments[argc-1].substr(pos);
-    if (extension != ".gcode" && extension != ".GCODE" &&
-        extension != ".bgcode" && extension != ".BGCODE" &&
-        extension != ".pp" &&
-        extension != ".bgc" && extension != ".BGC") {
-        std::cout << "Found invalid extension '" << extension << "' (required extensions: .gcode or .bgcode or .bgc)\n";
-        return false;
+
+    // check if we are a post-processor
+    for (size_t i = 1; i < arguments.size()-1; ++i) {
+        auto a = arguments[i];
+        if (a.find("post-processor") != std::string_view::npos) {
+            is_post_processing = true;
+            break;
+        }
+    }
+
+    // only do a extension check if we are not post processing
+    if (!is_post_processing) {
+        const std::string_view extension = arguments[argc-1].substr(pos);
+        if (extension != ".gcode" && extension != ".GCODE" &&
+            extension != ".bgcode" && extension != ".BGCODE" &&
+            extension != ".bgc" && extension != ".BGC") {
+            std::cout << "Found invalid extension '" << extension << "' (required extensions: .gcode or .bgcode or .bgc)\n";
+            return false;
+        }
     }
     src_filename = arguments[argc-1];
 
@@ -109,7 +121,6 @@ bool parse_args(int argc, const char* argv[], std::string& src_filename, bool& s
             pos = a.find("=");
             if (pos == std::string_view::npos) {
                 if (a.find("post-processor") != std::string_view::npos) {
-                    is_post_processing = true;
                     continue;
                 }
 
