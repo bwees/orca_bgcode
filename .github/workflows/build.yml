@@ -1,6 +1,6 @@
 name: Build
 
-on: [push, pull_request, workflow_dispatch]
+on: [push, pull_request, workflow_dispatch, release]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -39,7 +39,7 @@ jobs:
       if: success()
       with:
         name: bgcode-linux
-        path: ${{github.workspace}}/dist
+        path: ${{github.workspace}}/dist/bin
 
     - name: Create ZIP file (only for release)
       if: github.event_name == 'release'
@@ -88,7 +88,7 @@ jobs:
       if: success()
       with:
         name: bgcode-windows
-        path: ${{github.workspace}}\dist
+        path: ${{github.workspace}}\dist\bin
 
     - name: Upload ZIP to GitHub Release
       if: github.event_name == 'release'
@@ -126,7 +126,7 @@ jobs:
       if: success()
       with:
         name: bgcode-mac
-        path: ${{github.workspace}}/dist
+        path: ${{github.workspace}}/dist/bin
 
     - name: Create ZIP file (only for release)
       if: github.event_name == 'release'
