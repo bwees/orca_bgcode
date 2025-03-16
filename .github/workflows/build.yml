@@ -43,13 +43,13 @@ jobs:
 
     - name: Create ZIP file (only for release)
       if: github.event_name == 'release'
-      run: zip -j orca_bgcode_linux.zip ${{github.workspace}}/dist/bin/bgcode
+      run: zip -j orca_bgcode_linux_amd64.zip ${{github.workspace}}/dist/bin/bgcode
 
     - name: Upload ZIP to GitHub Release
       if: github.event_name == 'release'
       uses: softprops/action-gh-release@v1
       with:
-        files: orca_bgcode_linux.zip
+        files: orca_bgcode_linux_amd64.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -130,7 +130,7 @@ jobs:
 
     - name: Create ZIP file (only for release)
       if: github.event_name == 'release'
-      run: zip -j ${{github.workspace}}/orca_bgcode_macos.zip ${{github.workspace}}/dist/bin/bgcode
+      run: zip -j ${{github.workspace}}/orca_bgcode_macos_arm64.zip ${{github.workspace}}/dist/bin/bgcode
 
     - name: Upload ZIP to GitHub Release
       if: github.event_name == 'release'
@@ -172,7 +172,7 @@ jobs:
 
     - name: Create ZIP file (only for release)
       if: github.event_name == 'release'
-      run: zip -j ${{github.workspace}}/orca_bgcode_macos.zip ${{github.workspace}}/dist/bin/bgcode
+      run: zip -j ${{github.workspace}}/orca_bgcode_macos_amd64.zip ${{github.workspace}}/dist/bin/bgcode
 
     - name: Upload ZIP to GitHub Release
       if: github.event_name == 'release'
