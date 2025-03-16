@@ -38,7 +38,7 @@ jobs:
       name: Upload Linux Build
       if: success()
       with:
-        name: bgcode-linux
+        name: bgcode-linux-amd64
         path: ${{github.workspace}}/dist/bin
 
     - name: Create ZIP file (only for release)
@@ -83,7 +83,7 @@ jobs:
       name: Upload windows build
       if: success()
       with:
-        name: bgcode-windows
+        name: bgcode-windows-amd64
         path: ${{github.workspace}}\dist\bin
 
     - name: Create ZIP file (only for release)
@@ -125,7 +125,7 @@ jobs:
       name: Upload MacOS Build
       if: success()
       with:
-        name: bgcode-mac
+        name: bgcode-mac-arm64
         path: ${{github.workspace}}/dist/bin
 
     - name: Create ZIP file (only for release)
@@ -167,7 +167,7 @@ jobs:
       name: Upload MacOS Build
       if: success()
       with:
-        name: bgcode-mac
+        name: bgcode-mac-amd64
         path: ${{github.workspace}}/dist/bin
 
     - name: Create ZIP file (only for release)
