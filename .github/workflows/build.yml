@@ -41,6 +41,18 @@ jobs:
         name: bgcode-linux
         path: ${{github.workspace}}/dist
 
+    - name: Create ZIP file (only for release)
+      if: github.event_name == 'release'
+      run: zip orca_bgcode_linux.zip ${{github.workspace}}/dist/bin/bgcode
+
+    - name: Upload ZIP to GitHub Release
+      if: github.event_name == 'release'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: orca_bgcode_linux.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build-msvc:
     runs-on: windows-2019
 
@@ -78,6 +90,14 @@ jobs:
         name: bgcode-windows
         path: ${{github.workspace}}\dist
 
+    - name: Upload ZIP to GitHub Release
+      if: github.event_name == 'release'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ${{github.workspace}}\dist\bin\bgcode.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build-mac:
     # The CMake configure and build commands are platform agnostic and should work equally
     # well on Windows or Mac.  You can convert this to a matrix build if you need
@@ -107,3 +127,15 @@ jobs:
       with:
         name: bgcode-mac
         path: ${{github.workspace}}/dist
+
+    - name: Create ZIP file (only for release)
+      if: github.event_name == 'release'
+      run: zip orca_bgcode_macos.zip ${{github.workspace}}/dist/bin/bgcode
+
+    - name: Upload ZIP to GitHub Release
+      if: github.event_name == 'release'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: orca_bgcode_macos.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
