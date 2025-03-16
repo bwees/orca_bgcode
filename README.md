@@ -4,13 +4,18 @@ Binary G-Code Post Processor for OrcaSlicer
 
 ## Installation
 
-Run the following to compile:
+1. Get bgcode binary
 
-```
-cmake --preset default -DLibBGCode_BUILD_DEPS=ON -DCMAKE_INSTALL_PREFIX=dist/  
-cmake --build --preset default --target install
-```
+    - (recommended) Download the correct binary for your machine from the [latest release](https://github.com/bwees/orca_bgcode/releases/latest)
+    
+    - Or clone the repository and run the following to compile:
 
-In OrcaSlicer, add the following to your post-processor steps:
+        ```
+        cmake --preset default -DLibBGCode_BUILD_DEPS=ON -DCMAKE_INSTALL_PREFIX=dist/  
+        cmake --build --preset default --target install
+        ```
 
-`<path to orca_bgcode>/dist/bin/bgcode --post-processor --slicer_metadata_compression=1 --gcode_compression=3 --gcode_encoding=2`
+
+2. In OrcaSlicer, add the following to your post-processor steps:
+
+    ```<path to orca_bgcode>/dist/bin/bgcode --post-processor --slicer_metadata_compression=1 --gcode_compression=3 --gcode_encoding=2```
