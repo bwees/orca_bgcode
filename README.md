@@ -18,4 +18,4 @@ Binary G-Code Post Processor for OrcaSlicer
 
 2. In OrcaSlicer, add the following to your post-processor steps:
 
-    ```<path to orca_bgcode>/dist/bin/bgcode --post-processor --slicer_metadata_compression=1 --gcode_compression=3 --gcode_encoding=2```
+    ```<path to orca_bgcode> --post-processor --slicer_metadata_compression=1 --gcode_compression=3 --gcode_encoding=2```
