@@ -1,6 +1,6 @@
 name: Build
 
-on: [push, pull_request, workflow_dispatch, release]
+on: [workflow_dispatch, release]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -88,13 +88,13 @@ jobs:
 
     - name: Create ZIP file (only for release)
       if: github.event_name == 'release'
-      run: Compress-Archive -Path ${{github.workspace}}\dist\bin\* -DestinationPath ${{github.workspace}}\orca_bgcode_windows.zip
+      run: Compress-Archive -Path ${{github.workspace}}\dist\bin\* -DestinationPath ${{github.workspace}}\orca_bgcode_windows_amd64.zip
 
     - name: Upload ZIP to GitHub Release
       if: github.event_name == 'release'
       uses: softprops/action-gh-release@v1
       with:
-        files: ${{github.workspace}}/orca_bgcode_windows.zip
+        files: D:/a/orca_bgcode/orca_bgcode/orca_bgcode_windows_amd64.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
