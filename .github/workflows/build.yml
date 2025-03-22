@@ -94,7 +94,7 @@ jobs:
       if: github.event_name == 'release'
       uses: softprops/action-gh-release@v1
       with:
-        files: ${{github.workspace}}\orca_bgcode_windows.zip
+        files: ${{github.workspace}}/orca_bgcode_windows.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
