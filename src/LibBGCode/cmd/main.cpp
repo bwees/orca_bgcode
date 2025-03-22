@@ -93,6 +93,7 @@ bool parse_args(int argc, const char* argv[], std::string& src_filename, bool& s
     if (!is_post_processing) {
         const std::string_view extension = arguments[argc-1].substr(pos);
         if (extension != ".gcode" && extension != ".GCODE" &&
+            extension != ".pp" && extension != ".PP" &&
             extension != ".bgcode" && extension != ".BGCODE" &&
             extension != ".bgc" && extension != ".BGC") {
             std::cout << "Found invalid extension '" << extension << "' (required extensions: .gcode or .bgcode or .bgc)\n";
