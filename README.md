@@ -1,6 +1,6 @@
-# orca_bgcode
+# OrcaSlicer Binary G-Code (bgcode) Support
 
-Binary G-Code Post Processor for OrcaSlicer
+This allows OrcaSlicer to output bgcode for use with Prusa Machines through a simple post-processing script that can be added to any print profile. Also supports renaming the output file to have the `.bgcode` extension.
 
 ## Installation
 
@@ -19,5 +19,5 @@ Binary G-Code Post Processor for OrcaSlicer
 2. In OrcaSlicer, add the following to your post-processor steps:
 
     ```
-    <path to orca_bgcode> --post-processor --slicer_metadata_compression=1 --gcode_compression=3 --gcode_encoding=2
+    <path to bgcode binary> --post-processor --slicer_metadata_compression=1 --gcode_compression=3 --gcode_encoding=2
     ```
