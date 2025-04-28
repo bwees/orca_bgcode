@@ -251,7 +251,10 @@ int main(int argc, const char* argv[])
 
         // we have to delete the original file first before renaming the new file
         // if this line is not here, windows will not allow the rename to happen
-        std::remove(src_filename.c_str());
+        if (std::remove(src_filename.c_str()) != 0) {
+            std::cout << "Unable to delete file '" << src_filename << "'\n";
+            return EXIT_FAILURE;
+        }
 
         // move file to be in place of the original file
         if (std::rename(dst_filename.c_str(), src_filename.c_str()) != 0) {
