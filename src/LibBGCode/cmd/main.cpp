@@ -240,6 +240,10 @@ int main(int argc, const char* argv[])
             }
         }
         std::cout << "Succesfully generated file '" << dst_filename << "'\n";
+
+        // close the files
+        scoped_src_file.~ScopedFile();
+        scoped_dst_file.~ScopedFile();
     }
     else {
         std::cout << "Unable to convert the file '" << src_filename << "'\n";
