@@ -15,9 +15,11 @@ This allows OrcaSlicer to output bgcode for use with Prusa Machines through a si
         cmake --build --preset default --target install
         ```
 
+2. **Windows Only**
+    - You must install the latest Microsoft Visual C++ Redistributable in order for this program to work. You can download it here: https://aka.ms/vs/17/release/vc_redist.x64.exe
 
 2. In OrcaSlicer, add the following to your post-processor steps:
 
     ```
-    <path to bgcode binary> --post-processor --slicer_metadata_compression=1 --gcode_compression=3 --gcode_encoding=2
+    <path to bgcode binary or exe> --post-processor --slicer_metadata_compression=1 --gcode_compression=3 --gcode_encoding=2
     ```
