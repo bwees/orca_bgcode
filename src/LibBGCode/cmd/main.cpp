@@ -248,6 +248,11 @@ int main(int argc, const char* argv[])
     }
 
     if (is_post_processing) {
+
+        // we have to delete the original file first before renaming the new file
+        // this fails on windows for some reason
+        std::remove(src_filename.c_str());
+
         // move file to be in place of the original file
         if (std::rename(dst_filename.c_str(), src_filename.c_str()) != 0) {
             std::cout << "Unable to move file '" << dst_filename << "' to '" << src_filename << "'\n";
