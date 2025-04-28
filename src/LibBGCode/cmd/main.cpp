@@ -250,7 +250,7 @@ int main(int argc, const char* argv[])
     if (is_post_processing) {
 
         // we have to delete the original file first before renaming the new file
-        // this fails on windows for some reason
+        // if this line is not here, windows will not allow the rename to happen
         std::remove(src_filename.c_str());
 
         // move file to be in place of the original file
