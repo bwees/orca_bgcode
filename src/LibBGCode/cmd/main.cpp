@@ -184,11 +184,13 @@ bool parse_args(int argc, const char* argv[], std::string& src_filename, bool& s
 int main(int argc, const char* argv[])
 {
     std::string src_filename;
+    std::string dst_filename;
     bool src_is_binary;
     bool is_post_processing = false;
     BinarizerConfig config;
     if (!parse_args(argc, argv, src_filename, src_is_binary, is_post_processing, config))
         return EXIT_FAILURE;
+
 
     // scope for files
     {
@@ -206,7 +208,7 @@ int main(int argc, const char* argv[])
         const std::string dst_extension = src_is_binary ?
             (src_extension == ".gcode") ? ".1.gcode" : ".gcode" :
             (src_extension == ".bgcode") ? ".1.bgcode" : ".bgcode";
-        const std::string dst_filename = src_stem + dst_extension;
+        dst_filename = src_stem + dst_extension;
     
         // Open destination file
         FILE* dst_file = boost::nowide::fopen(dst_filename.c_str(), "wb");
