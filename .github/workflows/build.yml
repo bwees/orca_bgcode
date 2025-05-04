@@ -1,6 +1,13 @@
 name: Build
 
-on: [workflow_dispatch, release, push]
+on: 
+  workflow_dispatch:
+    
+  release:
+    types: [published]
+
+  push:
+
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
