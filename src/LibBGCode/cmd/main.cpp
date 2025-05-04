@@ -190,65 +190,64 @@ int main(int argc, const char* argv[])
     if (!parse_args(argc, argv, src_filename, src_is_binary, is_post_processing, config))
         return EXIT_FAILURE;
 
-    // Open source file
-    FILE* src_file = boost::nowide::fopen(src_filename.c_str(), "rb");
-    if (src_file == nullptr) {
-        std::cout << "Unable to open file '" << src_filename << "'\n";
-        return EXIT_FAILURE;
-    }
-    ScopedFile scoped_src_file(src_file);
-
-    const size_t pos = src_filename.find_last_of(".");
-    const std::string src_stem = src_filename.substr(0, pos);
-    const std::string src_extension = (pos != std::string::npos) ? src_filename.substr(pos) : "";
-    const std::string dst_extension = src_is_binary ?
-        (src_extension == ".gcode") ? ".1.gcode" : ".gcode" :
-        (src_extension == ".bgcode") ? ".1.bgcode" : ".bgcode";
-    const std::string dst_filename = src_stem + dst_extension;
-
-    // Open destination file
-    FILE* dst_file = boost::nowide::fopen(dst_filename.c_str(), "wb");
-    if (dst_file == nullptr) {
-        std::cout << "Unable to open file '" << dst_filename << "'\n";
-        return EXIT_FAILURE;
-    }
-    ScopedFile scoped_dst_file(dst_file);
-
-    // Perform conversion
-    const EResult res = src_is_binary ? from_binary_to_ascii(*src_file, *dst_file, true) : from_ascii_to_binary(*src_file, *dst_file, config);
-    if (res == EResult::Success) {
-        if (!src_is_binary) {
-            std::cout << "Binarization parameters\n";
-            for (const Parameter& p : parameters) {
-                std::cout << p.name << ": ";
-                if (p.name == "checksum")
-                    std::cout << p.values[(size_t)config.checksum] << "\n";
-                else if (p.name == "file_metadata_compression")
-                    std::cout << p.values[(size_t)config.compression.file_metadata] << "\n";
-                else if (p.name == "print_metadata_compression")
-                    std::cout << p.values[(size_t)config.compression.print_metadata] << "\n";
-                else if (p.name == "printer_metadata_compression")
-                    std::cout << p.values[(size_t)config.compression.printer_metadata] << "\n";
-                else if (p.name == "slicer_metadata_compression")
-                    std::cout << p.values[(size_t)config.compression.slicer_metadata] << "\n";
-                else if (p.name == "gcode_compression")
-                    std::cout << p.values[(size_t)config.compression.gcode] << "\n";
-                else if (p.name == "gcode_encoding")
-                    std::cout << p.values[(size_t)config.gcode_encoding] << "\n";
-                else if (p.name == "metadata_encoding")
-                    std::cout << p.values[(size_t)config.metadata_encoding] << "\n";
-            }
+    // scope for files
+    {
+        // Open source file
+        FILE* src_file = boost::nowide::fopen(src_filename.c_str(), "rb");
+        if (src_file == nullptr) {
+            std::cout << "Unable to open file '" << src_filename << "'\n";
+            return EXIT_FAILURE;
         }
-        std::cout << "Succesfully generated file '" << dst_filename << "'\n";
-
-        // close the files
-        scoped_src_file.~ScopedFile();
-        scoped_dst_file.~ScopedFile();
-    }
-    else {
-        std::cout << "Unable to convert the file '" << src_filename << "'\n";
-        std::cout << "Error: " << translate_result(res) << "\n";
-        return EXIT_FAILURE;
+        ScopedFile scoped_src_file(src_file);
+    
+        const size_t pos = src_filename.find_last_of(".");
+        const std::string src_stem = src_filename.substr(0, pos);
+        const std::string src_extension = (pos != std::string::npos) ? src_filename.substr(pos) : "";
+        const std::string dst_extension = src_is_binary ?
+            (src_extension == ".gcode") ? ".1.gcode" : ".gcode" :
+            (src_extension == ".bgcode") ? ".1.bgcode" : ".bgcode";
+        const std::string dst_filename = src_stem + dst_extension;
+    
+        // Open destination file
+        FILE* dst_file = boost::nowide::fopen(dst_filename.c_str(), "wb");
+        if (dst_file == nullptr) {
+            std::cout << "Unable to open file '" << dst_filename << "'\n";
+            return EXIT_FAILURE;
+        }
+        ScopedFile scoped_dst_file(dst_file);
+    
+        // Perform conversion
+        const EResult res = src_is_binary ? from_binary_to_ascii(*src_file, *dst_file, true) : from_ascii_to_binary(*src_file, *dst_file, config);
+        if (res == EResult::Success) {
+            if (!src_is_binary) {
+                std::cout << "Binarization parameters\n";
+                for (const Parameter& p : parameters) {
+                    std::cout << p.name << ": ";
+                    if (p.name == "checksum")
+                        std::cout << p.values[(size_t)config.checksum] << "\n";
+                    else if (p.name == "file_metadata_compression")
+                        std::cout << p.values[(size_t)config.compression.file_metadata] << "\n";
+                    else if (p.name == "print_metadata_compression")
+                        std::cout << p.values[(size_t)config.compression.print_metadata] << "\n";
+                    else if (p.name == "printer_metadata_compression")
+                        std::cout << p.values[(size_t)config.compression.printer_metadata] << "\n";
+                    else if (p.name == "slicer_metadata_compression")
+                        std::cout << p.values[(size_t)config.compression.slicer_metadata] << "\n";
+                    else if (p.name == "gcode_compression")
+                        std::cout << p.values[(size_t)config.compression.gcode] << "\n";
+                    else if (p.name == "gcode_encoding")
+                        std::cout << p.values[(size_t)config.gcode_encoding] << "\n";
+                    else if (p.name == "metadata_encoding")
+                        std::cout << p.values[(size_t)config.metadata_encoding] << "\n";
+                }
+            }
+            std::cout << "Succesfully generated file '" << dst_filename << "'\n";
+        }
+        else {
+            std::cout << "Unable to convert the file '" << src_filename << "'\n";
+            std::cout << "Error: " << translate_result(res) << "\n";
+            return EXIT_FAILURE;
+        }
     }
 
     if (is_post_processing) {
